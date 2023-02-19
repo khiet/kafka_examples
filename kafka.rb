@@ -10,14 +10,27 @@ kafka = Kafka.new(
   sasl_over_ssl: true
 )
 
+def cowsay(message, tongue: false, color: false)
+  command = tongue ? "cowsay -T U #{message}" : "cowsay #{message}"
+  command = "#{command} | lolcat" if color
+
+  system command
+end
+
 # Consume
 
-consumer = kafka.consumer(group_id: 'ruby-kafka')
+consumer = kafka.consumer(group_id: "ruby-kafka-#{Time.now.to_i}")
 consumer.subscribe(ENV.fetch('KAFKA_TOPIC'))
 
+pets_spending = 0
 consumer.each_message do |message|
-  puts message.topic, message.partition
-  puts message.offset, message.key, message.value
+  parsed_message = JSON.parse(message.value)
+  pets_spending += parsed_message['amount']
+
+  system 'clear'
+  cowsay(pets_spending, tongue: pets_spending > 100, color: pets_spending > 200)
+
+  sleep 0.1
 end
 
 # Produce
