@@ -1,6 +1,10 @@
 // KafkaJS: https://github.com/tulios/kafkajs
 const { Kafka } = require('kafkajs')
 
+// 1. Subscribe to the 'bank connections' topic
+// 2. For each account transaction in 'get_account_transactions' message
+// 3.   Look for 'Pets' in 'transaction_classification'
+// 4.   Produce a message to the 'pets_spending' topic with the transaction 'amount'
 const kafka = new Kafka({
   clientId: 'kafkaJS',
   brokers: process.env.KAFKA_BOOTSTRAP_SERVERS.split(','),
@@ -23,13 +27,10 @@ const pipePetsSpending = async (message) => {
       if (item['transaction_classification'].includes('Pets') && item.amount < 0) {
 
         await producer.send({
-          topic: 'bank_connections_demo',
+          topic: 'pets_spending',
           messages: [
             {
-              value: JSON.stringify({
-                transaction_classification: 'Pets',
-                amount: Math.abs(item.amount)
-              })
+              value: JSON.stringify({ amount: Math.abs(item.amount) })
             },
           ],
         })
@@ -42,7 +43,7 @@ const run = async () => {
   await consumer.connect()
   await producer.connect()
 
-  await consumer.subscribe({ topic: process.env.KAFKA_TOPIC, fromBeginning: true })
+  await consumer.subscribe({ topic: 'bank_connections', fromBeginning: true })
   await consumer.run({
     eachMessage: async ({ _topic, _partition, message }) => await pipePetsSpending(message),
   })

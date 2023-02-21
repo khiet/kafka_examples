@@ -1,6 +1,11 @@
 # https://github.com/zendesk/ruby-kafka
 require 'kafka'
 
+# 1. Subscribe to the 'pets_spending' topic
+# 2. Consume each message and display a cow 🐮 depending on these cases:
+#   case 1: amount < 30  => cow
+#   case 2: amount >= 30 => cow with tongue
+#   case 3: amount >= 50 => rainbow cow with tongue
 kafka = Kafka.new(
   ENV.fetch('KAFKA_BOOTSTRAP_SERVERS').split(','),
   sasl_scram_username: ENV.fetch('KAFKA_SASL_USERNAME'),
@@ -20,22 +25,17 @@ end
 # Consume
 
 consumer = kafka.consumer(group_id: "ruby-kafka-#{Time.now.to_i}")
-consumer.subscribe(ENV.fetch('KAFKA_TOPIC'))
+consumer.subscribe('pets_spending')
 
-pets_spending = 0
+system 'clear'
+cowsay("Feed me!")
+
 consumer.each_message do |message|
   parsed_message = JSON.parse(message.value)
-  pets_spending += parsed_message['amount']
+  amount = parsed_message['amount']
 
   system 'clear'
-  cowsay(pets_spending, tongue: pets_spending > 100, color: pets_spending > 200)
+  cowsay("Thank you! £#{amount}", tongue: amount >= 30, color: amount >= 50)
 
   sleep 0.1
 end
-
-# Produce
-
-# require 'json'
-# producer = kafka.producer
-# producer.produce({ ping: Time.new }.to_json, topic: "example")
-# producer.deliver_messages
