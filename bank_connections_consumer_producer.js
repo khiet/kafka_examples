@@ -1,10 +1,10 @@
 // KafkaJS: https://github.com/tulios/kafkajs
 const { Kafka } = require('kafkajs')
 
-// 1. Subscribe to the 'bank connections' topic
-// 2. For each account transaction in 'get_account_transactions' message
-// 3.   Look for 'Pets' in 'transaction_classification'
-// 4.   Produce a message to the 'pets_spending' topic with the transaction 'amount'
+// 1. Consume from the 'bank connections' topic
+// 2. For each transaction in the 'get_account_transactions' message
+// 3.   Look for a keyword 'Pets' in 'transaction_classification'
+// 4.   If found, produce a message to the 'pets_spending' topic and records the transaction 'amount'
 const kafka = new Kafka({
   clientId: 'kafkaJS',
   brokers: process.env.KAFKA_BOOTSTRAP_SERVERS.split(','),

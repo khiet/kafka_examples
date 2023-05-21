@@ -1,8 +1,8 @@
 # https://github.com/zendesk/ruby-kafka
 require 'kafka'
 
-# 1. Subscribe to the 'pets_spending' topic
-# 2. Consume each message and display a cow 🐮 depending on these cases:
+# 1. Consume from the 'pets_spending' topic
+# 2. For each message, display different types of cows 🐮 depending on the following use cases:
 #   case 1: amount < 30  => cow
 #   case 2: amount >= 30 => cow with tongue
 #   case 3: amount >= 50 => rainbow cow with tongue
