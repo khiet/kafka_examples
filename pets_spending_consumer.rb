@@ -37,5 +37,11 @@ consumer.each_message do |message|
   system 'clear'
   cowsay("Thank you! £#{amount}", tongue: amount >= 30, color: amount >= 50)
 
-  sleep 0.1
+  if amount >= 50
+    sleep 3
+  elsif amount >= 30
+    sleep 2
+  else
+    sleep 1
+  end
 end
